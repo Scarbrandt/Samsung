@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR App</title>
+</head>
+<body>
+    <h1>OCR Image Upload</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="imageInput" name="file" accept="image/png, image/jpeg" onchange="previewImage();">
+        <button type="button" onclick="uploadImage()">Predict</button>
+    </form>
+    <h2>Image Preview:</h2>
+    <img id="imagePreview" src="" alt="Image preview..." style="max-width: 500px; max-height: 500px;">
+    <h2>Results:</h2>
+    <div id="results"></div>
+
+    <script>
+        function previewImage() {
+            var file = document.getElementById('imageInput').files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function () {
+                document.getElementById('imagePreview').src = reader.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').src = "";
+            }
+        }
+
+        function uploadImage() {
+            const formData = new FormData();
+            const imageInput = document.getElementById('imageInput');
+            formData.append("file", imageInput.files[0]);
+
+            fetch('/predict/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('results').textContent = data.result;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
